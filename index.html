@@ -688,43 +688,45 @@
 </div>
 
 <script>
-  const SYSTEM_PROMPT = `You are an expert feline nutritionist and cat food researcher. The user has a cat named "House Guest" who is toothless, has a sensitive stomach, sensitive skin, and these strict dietary requirements:
+  const SYSTEM_PROMPT = `You are a strict cat food screening engine for a cat named "House Guest." Your job is to find real, currently available wet cat foods that pass ALL hard filters below. A product that fails even ONE hard filter must be excluded entirely — do not include it, do not flag it, just exclude it.
 
-MUST AVOID (hard filters — disqualify any food containing these):
-- Chicken or chicken by-products in any form
-- Grains or gluten: wheat, corn, soy, oats, barley
-- Artificial preservatives: BHA, BHT, ethoxyquin
-- Dry or semi-moist food (wet food only)
-- Any chunky or shredded textures (no teeth — must be smooth)
+HARD FILTERS — ZERO TOLERANCE. Any product containing any of the following is DISQUALIFIED:
+1. Chicken, chicken meal, chicken broth, chicken liver, chicken fat, or ANY chicken by-product in any form
+2. Grains or gluten of any kind: wheat, corn, soy, oats, barley, rice, millet, or any flour/starch derivative
+3. Artificial preservatives: BHA, BHT, ethoxyquin, sodium nitrite, or artificial colors/dyes
+4. Dry food, semi-moist food, kibble, or treats — wet food ONLY
+5. Chunky, shredded, minced, flaked, or stew textures — pâté or purée ONLY (smooth throughout)
+6. Any Merrick brand product — Merrick is being replaced, do not suggest it
 
-MUST HAVE:
-- Pâté or purée texture only — smooth, no chunks, no gravy with pieces
-- Wet food with high moisture content (≥78%)
-- Grain-free formulation
+Before recommending any product, mentally check it against all 6 filters. If it fails any one of them, discard it and find a different product.
 
-STRONGLY PREFERRED:
-- High protein (≥45% dry matter basis)
-- Omega-3 and Omega-6 fatty acids for sensitive skin and coat
-- Limited ingredient diet (LID) with single named protein source
-- No artificial colors or flavors
-- Taurine supplemented
+REQUIRED IN EVERY RESULT:
+- Wet food pâté or purée texture — completely smooth, no pieces
+- Moisture content ≥78%
+- Grain-free confirmed
 
-CRITICAL EXCLUSION: Do NOT recommend any Merrick brand products. Merrick is the food being replaced — the user needs alternatives, not more Merrick.
+SCORING CRITERIA (use these to rank passing products):
+- High protein ≥45% dry matter basis → adds to score
+- Omega-3 and Omega-6 fatty acids present → adds to score (important: sensitive skin)
+- Limited ingredient diet (LID) with single named protein → adds to score
+- No artificial colors or flavors → adds to score
+- Taurine explicitly listed → adds to score
+- Novel protein (rabbit, duck, venison, quail) → adds to score for sensitive stomach
 
-Return ONLY a valid JSON array of exactly 4 real cat food products that best match these requirements. Use your knowledge of actual products on the market. Each object must have exactly these fields:
+Return ONLY a valid JSON array of exactly 4 products that passed ALL hard filters. Each object must have exactly these fields:
 {
   "name": "full product name as sold",
   "brand": "brand name",
-  "score": <integer 1-100 representing fit for House Guest's needs>,
+  "score": <integer 1-100 based on scoring criteria above>,
   "texture": "pâté" or "purée" or "mousse",
-  "protein": "primary protein (e.g. Turkey, Salmon, Rabbit)",
-  "keyIngredients": "brief comma-separated highlight of top ingredients",
-  "avoids": ["confirmed absent allergens from avoid list"],
-  "flags": ["any minor concerns or caveats for House Guest"],
-  "analysis": "2 sentences: why this food works or any concerns for House Guest specifically",
-  "chewyUrl": "real chewy.com search URL for this product",
-  "amazonUrl": "real amazon.com search URL for this product",
-  "petsmartUrl": "real petsmart.com search URL for this product",
+  "protein": "primary protein source",
+  "keyIngredients": "brief comma-separated highlight of top 4-5 ingredients",
+  "avoids": ["list each hard filter this product confirmed passes, e.g. 'No chicken', 'Grain-free', 'No BHA/BHT'"],
+  "flags": ["any minor concerns for sensitive stomach or skin — empty array if none"],
+  "analysis": "2 sentences explaining why this product passed screening and how it serves House Guest's specific needs",
+  "chewyUrl": "https://www.chewy.com/s?query=PRODUCT+NAME+ENCODED",
+  "amazonUrl": "https://www.amazon.com/s?k=PRODUCT+NAME+ENCODED&i=pet-supplies",
+  "petsmartUrl": "https://www.petsmart.com/search/?q=PRODUCT+NAME+ENCODED",
   "recommended": <true for your single top pick, false for all others>
 }
 
@@ -780,7 +782,7 @@ Return ONLY the raw JSON array. No markdown fences. No preamble. No explanation 
           model: 'claude-opus-4-5',
           max_tokens: 2000,
           system: SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: `Find the best matching cat foods for this search: "${query}". Prioritize real, currently available products.` }]
+          messages: [{ role: 'user', content: `Search query: "${query}"\n\nFind 4 real wet cat food products matching this query that pass ALL 6 hard filters (no chicken, no grains, no artificial preservatives, pâté/purée only, wet food only, no Merrick). Pre-screen each product against every filter before including it. Do not include any product that fails even one filter.` }]
         })
       });
 
