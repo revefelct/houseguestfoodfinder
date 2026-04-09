@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>House Guest's Food Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #FAF9F6;
+    --bg2: #F2F0EB;
+    --bg3: #E8E5DE;
+    --text: #1A1916;
+    --text2: #6B6860;
+    --text3: #9C9A93;
+    --border: rgba(26,25,22,0.12);
+    --border2: rgba(26,25,22,0.22);
+    --accent: #1A1916;
+    --green-bg: #EAF3DE;
+    --green-text: #3B6D11;
+    --red-bg: #FCEBEB;
+    --red-text: #A32D2D;
+    --amber-bg: #FAEEDA;
+    --amber-text: #854F0B;
+    --blue-bg: #E6F1FB;
+    --blue-text: #185FA5;
+    --blue-border: #378ADD;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  html { font-size: 16px; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* NAV */
+  nav {
+    border-bottom: 0.5px solid var(--border);
+    padding: 0 2rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .nav-brand {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--text);
+  }
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-tag {
+    font-size: 11px;
+    color: var(--text2);
+    font-weight: 300;
+  }
+  .api-indicator {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #639922;
+    display: inline-block;
+    margin-right: 5px;
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  /* HERO */
+  .hero {
+    margin-bottom: 2.5rem;
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 38px;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+  .hero-sub {
+    font-size: 14px;
+    color: var(--text2);
+    font-weight: 300;
+    margin-bottom: 16px;
+  }
+
+  /* PROFILE TAGS */
+  .profile-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 2rem;
+  }
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 11px;
+    border-radius: 20px;
+    line-height: 1;
+  }
+  .tag-red { background: var(--red-bg); color: var(--red-text); }
+  .tag-amber { background: var(--amber-bg); color: var(--amber-text); }
+  .tag-blue { background: var(--blue-bg); color: var(--blue-text); }
+  .tag-green { background: var(--green-bg); color: var(--green-text); }
+
+  /* CRITERIA PANEL */
+  .criteria-panel {
+    background: var(--bg2);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    border: 0.5px solid var(--border);
+  }
+  .panel-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 12px;
+  }
+  .criteria-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px 24px;
+  }
+  .criteria-item {
+    font-size: 12.5px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-red { background: #E24B4A; }
+  .dot-green { background: #639922; }
+  .dot-blue { background: #378ADD; }
+
+  /* API KEY INPUT */
+  .api-section {
+    margin-bottom: 1.5rem;
+  }
+  .api-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .api-input {
+    flex: 1;
+    padding: 9px 13px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    letter-spacing: 0.03em;
+  }
+  .api-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .api-note {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 5px;
+  }
+
+  /* SEARCH */
+  .search-section { margin-bottom: 2rem; }
+  .search-row {
+    display: flex;
+    gap: 10px;
+  }
+  .search-input {
+    flex: 1;
+    padding: 11px 15px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+  }
+  .search-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .btn {
+    padding: 11px 22px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    border-radius: var(--radius);
+    cursor: pointer;
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--bg2); }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+  .btn-primary:hover { opacity: 0.82; background: var(--text); }
+
+  /* QUICK SEARCHES */
+  .quick-searches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .quick-btn {
+    font-size: 11px;
+    padding: 4px 11px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border2);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.12s;
+  }
+  .quick-btn:hover { background: var(--bg2); color: var(--text); }
+
+  /* RESULTS */
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .results-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  .results-count {
+    font-size: 12px;
+    color: var(--text3);
+  }
+  .results-grid { display: grid; gap: 12px; }
+
+  /* FOOD CARD */
+  .food-card {
+    background: #fff;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    transition: border-color 0.15s;
+    animation: fadeIn 0.3s ease forwards;
+    opacity: 0;
+  }
+  .food-card:hover { border-color: var(--border2); }
+  .food-card.recommended { border: 1.5px solid var(--blue-border); }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    gap: 16px;
+  }
+  .food-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--text);
+    line-height: 1.25;
+  }
+  .food-meta {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 3px;
+  }
+  .score-block { text-align: right; flex-shrink: 0; }
+  .score-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .score-denom { font-size: 11px; color: var(--text3); }
+
+  /* SCORE BAR */
+  .score-bar-track {
+    height: 3px;
+    background: var(--bg3);
+    border-radius: 2px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--text);
+    transition: width 0.6s ease;
+  }
+
+  .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+  .analysis {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.65;
+    border-left: 2px solid var(--bg3);
+    padding-left: 12px;
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+
+  .card-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    padding-top: 12px;
+    border-top: 0.5px solid var(--border);
+  }
+  .rec-pill {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--blue-bg);
+    color: var(--blue-text);
+    margin-right: 4px;
+  }
+  .retailer-link {
+    font-size: 12px;
+    padding: 5px 13px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    color: var(--text);
+    text-decoration: none;
+    transition: background 0.12s;
+    display: inline-block;
+  }
+  .retailer-link:hover { background: var(--bg2); }
+  .order-btn {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 0.5px solid var(--blue-border);
+    background: var(--blue-bg);
+    color: var(--blue-text);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    margin-left: auto;
+    transition: background 0.12s;
+  }
+  .order-btn:hover { background: #B5D4F4; }
+
+  /* LOADING */
+  .loading-state {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--text3);
+    font-size: 14px;
+  }
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--bg3);
+    border-top-color: var(--text);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+    vertical-align: middle;
+    margin-right: 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--text3);
+    font-size: 14px;
+  }
+  .empty-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .error-bar {
+    background: var(--red-bg);
+    color: var(--red-text);
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    display: none;
+  }
+
+  /* MODAL */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,25,22,0.45);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    max-width: 480px;
+    width: 92%;
+    border: 0.5px solid var(--border);
+  }
+  .modal-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+  .modal-sub {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 18px;
+    line-height: 1.6;
+  }
+  .freq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    margin-bottom: 4px;
+  }
+  .freq-btn {
+    padding: 9px 12px;
+    font-size: 12.5px;
+    font-family: 'DM Sans', sans-serif;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.12s;
+    text-align: center;
+  }
+  .freq-btn:hover { background: var(--bg2); color: var(--text); }
+  .freq-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .qty-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .qty-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 0.5px solid var(--border2);
+    background: var(--bg);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    flex-shrink: 0;
+    transition: background 0.12s;
+  }
+  .qty-btn:hover { background: var(--bg2); }
+  .retailer-options { display: grid; gap: 8px; }
+  .retailer-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 15px;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.12s;
+    background: var(--bg);
+  }
+  .retailer-option:hover { background: var(--bg2); }
+  .retailer-option.selected { border-color: var(--blue-border); background: var(--blue-bg); }
+  .ro-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .ro-note { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .ro-savings { font-size: 12px; font-weight: 500; color: var(--green-text); }
+  .confirm-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--green-bg);
+    color: var(--green-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 14px;
+  }
+  .confirm-summary {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  .confirm-detail {
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 12.5px;
+    color: var(--text2);
+    line-height: 1.8;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 0.5px solid var(--border);
+    padding: 1.5rem 2rem;
+    font-size: 11px;
+    color: var(--text3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 1.5rem 1rem 3rem; }
+    .hero-title { font-size: 28px; }
+    .criteria-grid { grid-template-columns: 1fr; }
+    nav { padding: 0 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">House Guest</span>
+  <div class="nav-right">
+    <span class="nav-tag"><span class="api-indicator"></span>Claude API</span>
+    <span class="nav-tag">v1.0</span>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-eyebrow">AI-Powered Cat Food Screener</div>
+    <h1 class="hero-title">House Guest's Food Finder</h1>
+    <p class="hero-sub">Replacing Merrick — one grain-free, chicken-free, toothless-friendly pâté at a time.</p>
+    <div class="profile-tags">
+      <span class="tag tag-red">No chicken</span>
+      <span class="tag tag-red">No grains / gluten</span>
+      <span class="tag tag-red">No artificial preservatives</span>
+      <span class="tag tag-amber">Sensitive stomach</span>
+      <span class="tag tag-amber">Sensitive skin</span>
+      <span class="tag tag-blue">Pâté / purée only</span>
+      <span class="tag tag-blue">No dry food</span>
+      <span class="tag tag-green">Toothless — soft textures</span>
+    </div>
+  </div>
+
+  <div class="criteria-panel">
+    <div class="panel-label">Screening criteria baked into every search</div>
+    <div class="criteria-grid">
+      <div class="criteria-item"><div class="dot dot-red"></div>Grain-free &amp; gluten-free (no wheat, corn, soy)</div>
+      <div class="criteria-item"><div class="dot dot-red"></div>No chicken or chicken by-products</div>
+      <div class="criteria-item"><div class="dot dot-red"></div>No BHA, BHT, ethoxyquin or artificial colors</div>
+      <div class="criteria-item"><div class="dot dot-blue"></div>Pâté or purée texture — no chunks</div>
+      <div class="criteria-item"><div class="dot dot-blue"></div>Wet food only — moisture ≥78%</div>
+      <div class="criteria-item"><div class="dot dot-green"></div>High protein ≥45% dry matter basis</div>
+      <div class="criteria-item"><div class="dot dot-green"></div>Omega-3/6 for skin &amp; coat support</div>
+      <div class="criteria-item"><div class="dot dot-green"></div>Limited ingredient diet preferred</div>
+    </div>
+  </div>
+
+  <div class="api-section">
+    <div class="panel-label">Anthropic API key</div>
+    <div class="api-row">
+      <input type="password" id="apiKey" class="api-input" placeholder="sk-ant-..." autocomplete="off" />
+      <button class="btn" onclick="saveKey()">Save</button>
+    </div>
+    <p class="api-note">Your key is stored in localStorage only — never sent anywhere except api.anthropic.com</p>
+  </div>
+
+  <div class="search-section">
+    <div class="panel-label" style="margin-bottom:8px;">Search</div>
+    <div class="search-row">
+      <input type="text" id="searchInput" class="search-input" placeholder="e.g. turkey pâté, rabbit limited ingredient, salmon purée..." />
+      <button class="btn btn-primary" onclick="runSearch()">Search ↗</button>
+    </div>
+    <div class="quick-searches">
+      <span class="quick-label" style="font-size:11px;color:var(--text3);align-self:center;">Quick:</span>
+      <button class="quick-btn" onclick="setSearch('turkey pâté grain-free sensitive stomach')">Turkey pâté</button>
+      <button class="quick-btn" onclick="setSearch('rabbit limited ingredient grain-free cat food')">Rabbit LID</button>
+      <button class="quick-btn" onclick="setSearch('salmon purée omega-3 sensitive skin cat')">Salmon purée</button>
+      <button class="quick-btn" onclick="setSearch('duck pâté grain-free chicken-free cat')">Duck pâté</button>
+      <button class="quick-btn" onclick="setSearch('venison novel protein grain-free cat pâté')">Venison</button>
+    </div>
+  </div>
+
+  <div id="errorBar" class="error-bar"></div>
+
+  <div id="resultsArea">
+    <div class="empty-state">
+      <div class="empty-icon">🐱</div>
+      <div>Search above to find foods that meet House Guest's criteria.</div>
+      <div style="margin-top:6px;font-size:12px;">Results are ranked by fit score and screened against all criteria automatically.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>House Guest Food Finder — built with Claude API</span>
+  <span>Merrick replacement project · 2025</span>
+</footer>
+
+<!-- ORDER MODAL -->
+<div class="modal-backdrop" id="orderModal">
+  <div class="modal" style="max-width:480px;">
+    <div id="step1">
+      <div class="modal-title" id="modalTitle">Set up auto-order</div>
+      <p class="modal-sub" id="modalSub"></p>
+      <div class="panel-label" style="margin-bottom:8px;">Delivery frequency</div>
+      <div class="freq-grid" id="freqGrid">
+        <button class="freq-btn active" onclick="selectFreq(this,1)">Every 2 weeks</button>
+        <button class="freq-btn" onclick="selectFreq(this,2)">Monthly</button>
+        <button class="freq-btn" onclick="selectFreq(this,3)">Every 6 weeks</button>
+        <button class="freq-btn" onclick="selectFreq(this,4)">Every 2 months</button>
+      </div>
+      <div class="panel-label" style="margin:18px 0 8px;">Quantity per delivery</div>
+      <div class="qty-row">
+        <button class="qty-btn" onclick="changeQty(-1)">&#8722;</button>
+        <span id="qtyDisplay" style="font-size:15px;font-weight:500;min-width:90px;text-align:center;">12 cans</span>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+      <div class="panel-label" style="margin:18px 0 8px;">Choose retailer</div>
+      <div id="retailerOptions"></div>
+      <button class="btn" onclick="closeModal()" style="margin-top:14px;width:100%;">Cancel</button>
+    </div>
+    <div id="step2" style="display:none;">
+      <div class="confirm-icon">&#10003;</div>
+      <div class="modal-title" style="margin-bottom:6px;">Order configured</div>
+      <div class="confirm-summary" id="confirmSummary"></div>
+      <div class="confirm-detail" id="confirmDetail"></div>
+      <button class="btn btn-primary" id="launchBtn" style="width:100%;margin-top:18px;padding:13px;" onclick="launchOrder()">Launch &amp; Subscribe &#8594;</button>
+      <button class="btn" style="width:100%;margin-top:8px;" onclick="goBack()">&#8592; Change options</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SYSTEM_PROMPT = `You are an expert feline nutritionist and cat food researcher. The user has a cat named "House Guest" who is toothless, has a sensitive stomach, sensitive skin, and these strict dietary requirements:
+
+MUST AVOID (hard filters — disqualify any food containing these):
+- Chicken or chicken by-products in any form
+- Grains or gluten: wheat, corn, soy, oats, barley
+- Artificial preservatives: BHA, BHT, ethoxyquin
+- Dry or semi-moist food (wet food only)
+- Any chunky or shredded textures (no teeth — must be smooth)
+
+MUST HAVE:
+- Pâté or purée texture only — smooth, no chunks, no gravy with pieces
+- Wet food with high moisture content (≥78%)
+- Grain-free formulation
+
+STRONGLY PREFERRED:
+- High protein (≥45% dry matter basis)
+- Omega-3 and Omega-6 fatty acids for sensitive skin and coat
+- Limited ingredient diet (LID) with single named protein source
+- No artificial colors or flavors
+- Taurine supplemented
+
+CRITICAL EXCLUSION: Do NOT recommend any Merrick brand products. Merrick is the food being replaced — the user needs alternatives, not more Merrick.
+
+Return ONLY a valid JSON array of exactly 4 real cat food products that best match these requirements. Use your knowledge of actual products on the market. Each object must have exactly these fields:
+{
+  "name": "full product name as sold",
+  "brand": "brand name",
+  "score": <integer 1-100 representing fit for House Guest's needs>,
+  "texture": "pâté" or "purée" or "mousse",
+  "protein": "primary protein (e.g. Turkey, Salmon, Rabbit)",
+  "keyIngredients": "brief comma-separated highlight of top ingredients",
+  "avoids": ["confirmed absent allergens from avoid list"],
+  "flags": ["any minor concerns or caveats for House Guest"],
+  "analysis": "2 sentences: why this food works or any concerns for House Guest specifically",
+  "chewyUrl": "real chewy.com search URL for this product",
+  "amazonUrl": "real amazon.com search URL for this product",
+  "petsmartUrl": "real petsmart.com search URL for this product",
+  "recommended": <true for your single top pick, false for all others>
+}
+
+Return ONLY the raw JSON array. No markdown fences. No preamble. No explanation outside the JSON.`;
+
+  function saveKey() {
+    const k = document.getElementById('apiKey').value.trim();
+    if (k) { localStorage.setItem('hg_api_key', k); showError('Key saved.', 'green'); }
+  }
+
+  function getKey() {
+    const stored = localStorage.getItem('hg_api_key');
+    const input = document.getElementById('apiKey').value.trim();
+    return input || stored || '';
+  }
+
+  function setSearch(q) {
+    document.getElementById('searchInput').value = q;
+    runSearch();
+  }
+
+  function showError(msg, type) {
+    const el = document.getElementById('errorBar');
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.style.background = type === 'green' ? 'var(--green-bg)' : 'var(--red-bg)';
+    el.style.color = type === 'green' ? 'var(--green-text)' : 'var(--red-text)';
+    if (type === 'green') setTimeout(() => { el.style.display = 'none'; }, 2500);
+  }
+
+  function hideError() { document.getElementById('errorBar').style.display = 'none'; }
+
+  async function runSearch() {
+    const query = document.getElementById('searchInput').value.trim();
+    const key = getKey();
+    if (!query) { showError('Please enter a search query.'); return; }
+    if (!key) { showError('Please enter your Anthropic API key above.'); return; }
+
+    hideError();
+    const area = document.getElementById('resultsArea');
+    area.innerHTML = '<div class="loading-state"><span class="spinner"></span>Screening products for House Guest...</div>';
+
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-opus-4-5',
+          max_tokens: 2000,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: `Find the best matching cat foods for this search: "${query}". Prioritize real, currently available products.` }]
+        })
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error?.message || `API error ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      const raw = data.content?.find(b => b.type === 'text')?.text || '';
+      let foods;
+      try {
+        const clean = raw.replace(/```json|```/g, '').trim();
+        foods = JSON.parse(clean);
+      } catch {
+        throw new Error('Could not parse response — please try again.');
+      }
+      renderResults(foods, query);
+    } catch (err) {
+      area.innerHTML = '';
+      showError('Search failed: ' + err.message);
+    }
+  }
+
+  // Food store — avoids passing JSON through HTML attributes
+  const foodStore = {};
+
+  function renderResults(foods, query) {
+    const area = document.getElementById('resultsArea');
+    if (!foods?.length) {
+      area.innerHTML = '<div class="empty-state"><div>No matching products found.</div></div>';
+      return;
+    }
+    const sorted = [...foods].sort((a, b) => b.score - a.score);
+    // Store foods by index so onclick just passes a number
+    sorted.forEach((f, i) => { foodStore[i] = f; });
+    area.innerHTML = `
+      <div class="results-header">
+        <span class="results-label">Results</span>
+        <span class="results-count">${sorted.length} products · ranked by fit score</span>
+      </div>
+      <div class="results-grid">${sorted.map((f, i) => foodCard(f, i)).join('')}</div>`;
+  }
+
+  function foodCard(f, i) {
+    const delay = i * 80;
+    const avoidTags = (f.avoids || []).map(a => `<span class="tag tag-green">${a}</span>`).join('');
+    const flagTags = (f.flags || []).map(fl => `<span class="tag tag-amber">${fl}</span>`).join('');
+    const recPill = f.recommended ? '<span class="rec-pill">Top pick</span>' : '';
+    const score = Math.round(f.score);
+    const chewy = f.chewyUrl || `https://www.chewy.com/s?query=${encodeURIComponent(f.name)}`;
+    const amazon = f.amazonUrl || `https://www.amazon.com/s?k=${encodeURIComponent(f.name + ' cat food')}`;
+    const petsmart = f.petsmartUrl || `https://www.petsmart.com/search/?q=${encodeURIComponent(f.name)}`;
+
+    return `<div class="food-card${f.recommended ? ' recommended' : ''}" style="animation-delay:${delay}ms">
+      <div class="card-top">
+        <div>
+          <div class="food-name">${f.name}</div>
+          <div class="food-meta">${f.brand} &middot; ${f.texture || 'pâté'} &middot; ${f.protein || ''}</div>
+        </div>
+        <div class="score-block">
+          <div class="score-num">${score}</div>
+          <div class="score-denom">/ 100</div>
+        </div>
+      </div>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:${score}%"></div></div>
+      <div class="card-tags">${avoidTags}${flagTags}</div>
+      <div class="analysis">${f.analysis || ''}</div>
+      <div class="card-footer">
+        ${recPill}
+        <a href="${chewy}" target="_blank" class="retailer-link">Chewy</a>
+        <a href="${amazon}" target="_blank" class="retailer-link">Amazon</a>
+        <a href="${petsmart}" target="_blank" class="retailer-link">PetSmart</a>
+        <button class="order-btn" onclick="openOrder(${i})">Auto-order →</button>
+      </div>
+    </div>`;
+  }
+
+  // Auto-order state
+  let orderState = { food: null, freq: 1, qty: 12, retailer: null, launchUrl: '' };
+
+  const freqLabels = { 1: 'every 2 weeks', 2: 'monthly', 3: 'every 6 weeks', 4: 'every 2 months' };
+  const freqChewy = { 1: '&autoship=true&freq=2w', 2: '&autoship=true&freq=4w', 3: '&autoship=true&freq=6w', 4: '&autoship=true&freq=8w' };
+
+  function buildRetailerOptions(f) {
+    const q = encodeURIComponent(f.name + ' cat food pate grain free');
+    const qShort = encodeURIComponent(f.brand + ' ' + f.protein + ' cat pate');
+    return [
+      {
+        id: 'chewy',
+        name: 'Chewy Autoship',
+        note: 'Auto-applies subscription at checkout',
+        savings: 'Up to 30% off first order',
+        baseUrl: `https://www.chewy.com/s?query=${q}&nav-submit-button=&rh=i%3Aps_cat_food_wet%2Cp_subscription_enabled%3AAutoship+%26+Save`
+      },
+      {
+        id: 'amazon',
+        name: 'Amazon Subscribe & Save',
+        note: 'Subscribe & Save pre-selected on landing',
+        savings: '5–15% off every delivery',
+        baseUrl: `https://www.amazon.com/s?k=${q}&rh=n%3A2975403011%2Cp_n_subscribe_save_eligible%3A2617405011&i=pet-supplies`
+      },
+      {
+        id: 'petsmart',
+        name: 'PetSmart Repeat Delivery',
+        note: 'Select Repeat Delivery on product page',
+        savings: '10% off + free shipping',
+        baseUrl: `https://www.petsmart.com/search/?q=${qShort}&pmin=&pmax=&prefn1=productType&prefv1=Cat+Food`
+      }
+    ];
+  }
+
+  function openOrder(idx) {
+    const f = foodStore[idx];
+    if (!f) return;
+    orderState = { food: f, freq: 1, qty: 12, retailer: null, launchUrl: '' };
+
+    document.getElementById('modalTitle').textContent = f.brand;
+    document.getElementById('modalSub').textContent = f.name;
+
+    // Reset freq buttons
+    document.querySelectorAll('.freq-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === 0);
+    });
+    updateQtyDisplay();
+
+    // Build retailer options — store URLs in JS, never pass through onclick
+    const retailers = buildRetailerOptions(f);
+    window._retailers = {};
+    retailers.forEach(r => { window._retailers[r.id] = r; });
+    document.getElementById('retailerOptions').innerHTML = retailers.map(r => `
+      <div class="retailer-option" id="ro-${r.id}" onclick="selectRetailer('${r.id}')">
+        <div>
+          <div class="ro-name">${r.name}</div>
+          <div class="ro-note">${r.note}</div>
+        </div>
+        <div class="ro-savings">${r.savings}</div>
+      </div>`).join('');
+
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('orderModal').classList.add('open');
+  }
+
+  function selectFreq(btn, val) {
+    document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    orderState.freq = val;
+  }
+
+  function changeQty(delta) {
+    orderState.qty = Math.max(1, Math.min(48, orderState.qty + delta));
+    updateQtyDisplay();
+  }
+
+  function updateQtyDisplay() {
+    document.getElementById('qtyDisplay').textContent = orderState.qty + (orderState.qty === 1 ? ' can' : ' cans');
+  }
+
+  function selectRetailer(id) {
+    const r = window._retailers[id];
+    if (!r) return;
+    const baseUrl = r.baseUrl;
+    orderState.retailer = id;
+    orderState.launchUrl = baseUrl;
+    document.querySelectorAll('.retailer-option').forEach(el => el.classList.remove('selected'));
+    document.getElementById('ro-' + id).classList.add('selected');
+
+    // Short delay then advance to step 2
+    setTimeout(() => showConfirm(id, baseUrl), 220);
+  }
+
+  function showConfirm(id, baseUrl) {
+    const f = orderState.food;
+    const freq = freqLabels[orderState.freq];
+    const retailerNames = { chewy: 'Chewy Autoship', amazon: 'Amazon Subscribe & Save', petsmart: 'PetSmart Repeat Delivery' };
+    const savingsMap = { chewy: 'up to 30% off your first order', amazon: '5–15% off every delivery', petsmart: '10% off + free shipping' };
+
+    document.getElementById('confirmSummary').innerHTML =
+      `${orderState.qty} can${orderState.qty > 1 ? 's' : ''} of <strong>${f.name}</strong> via ${retailerNames[id]}, ${freq}`;
+
+    document.getElementById('confirmDetail').innerHTML =
+      `Retailer: ${retailerNames[id]}<br>` +
+      `Protein: ${f.protein} &middot; Texture: ${f.texture || 'pâté'}<br>` +
+      `Frequency: ${freq}<br>` +
+      `Quantity: ${orderState.qty} cans per delivery<br>` +
+      `Savings: ${savingsMap[id]}<br>` +
+      `<span style="color:var(--text3);font-size:11.5px;margin-top:4px;display:block;">You'll land directly on the subscription-eligible search results. Add to cart and confirm Autoship/Subscribe & Save at checkout.</span>`;
+
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+  }
+
+  function launchOrder() {
+    if (orderState.launchUrl) window.open(orderState.launchUrl, '_blank');
+    closeModal();
+  }
+
+  function goBack() {
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('step2').style.display = 'none';
+  }
+
+  function closeModal() {
+    document.getElementById('orderModal').classList.remove('open');
+  }
+
+  window.onclick = function(e) {
+    const modal = document.getElementById('orderModal');
+    if (e.target === modal) closeModal();
+  }
+
+  // Load saved key
+  const saved = localStorage.getItem('hg_api_key');
+  if (saved) document.getElementById('apiKey').value = saved;
+
+  // Enter key support
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') runSearch();
+  });
+</script>
+</body>
+</html>
